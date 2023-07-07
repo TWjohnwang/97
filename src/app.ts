@@ -1,8 +1,13 @@
 import express, { Express } from "express";
-import router from "./routers/router";
+import productRoutes from "./routes/productRoutes";
+import purchaseRoutes from "./routes/purchaseRoutes";
+import salesRoutes from "./routes/salesRoutes";
 
 const app: Express = express();
-app.use(router);
+app.use("/product", productRoutes);
+app.use("/purchase", purchaseRoutes);
+app.use("/sales", salesRoutes);
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

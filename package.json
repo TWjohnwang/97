@@ -1,22 +1,41 @@
 {
   "name": "nineseven",
   "version": "1.0.0",
-  "description": "",
+  "description": "A CRUD application for managing product data using the Knex library to interact with a MySQL database. This project utilizes Express.js as the backend framework and incorporates TypeScript for enhanced type safety and code organization. Explore the implementation of Create, Read, Update, and Delete operations for managing product information efficiently and securely.",
   "main": "app.js",
   "dependencies": {
-    "express": "^4.18.2"
+    "@types/chai-http": "^4.2.0",
+    "@types/lodash": "^4.14.195",
+    "bignumber.js": "^9.1.1",
+    "body-parser": "^1.20.2",
+    "chai-http": "^4.4.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "knex": "^2.4.2",
+    "lodash": "^4.17.21",
+    "mysql": "^2.18.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.5",
     "@types/express": "^4.17.17",
-    "@types/node": "^20.3.3",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^14.14.16",
+    "@types/sinon": "^10.0.15",
+    "@types/uuid": "^9.0.2",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
     "nodemon": "^2.0.22",
+    "sinon": "^15.2.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
   "scripts": {
+    "start": "nodemon --exec ts-node src/app.ts",
     "tsc": "tsc",
-    "start": "nodemon src/app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "ts-node": "ts-node",
+    "knex": "./node_modules/.bin/knex --knexfile src/models/database/knexfile.ts",
+    "test": "mocha -r ts-node/register 'src/test/*.test.ts'"
   },
   "repository": {
     "type": "git",
