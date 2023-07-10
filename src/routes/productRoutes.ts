@@ -12,7 +12,7 @@ import { dataTypeCheck, isPositiveInteger } from "../utils/ValidateInput";
 const productRoutes: Router = express.Router();
 productRoutes.use(bodyParser.json());
 
-// fetch all products
+// fetch products by specifying page number
 productRoutes.get("/", fetchAll);
 
 // fetch products by specifying conditions

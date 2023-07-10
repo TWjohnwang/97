@@ -3,7 +3,14 @@ import SalesClass from "../models/salesModel";
 import { Status, SalesData } from "../utils/interface";
 
 export async function fetchAll(req: Request, res: Response) {
-  const result = await SalesClass.fetchAllSales();
+  const page = req.query.page ? parseInt(req.query.page as string) : 1;
+  if (isNaN(page) || page === 0) {
+    return res.status(Status.BadRequest).json({
+      status: "failed",
+      message: "Invalid page number",
+    });
+  }
+  const result = await SalesClass.fetchAllSales(page);
   switch (result) {
     case false:
       res.status(Status.InternalServerError).json({

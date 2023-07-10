@@ -13,7 +13,9 @@ class PurchaseClass {
     this.quantity_purchased = quantity_purchased;
   }
 
-  public static async fetchAllPurchase(): Promise<PurchaseData[] | false | 0> {
+  public static async fetchAllPurchase(
+    page: number
+  ): Promise<PurchaseData[] | false | 0> {
     try {
       const data: PurchaseData[] = await db("purchase_records")
         .select(
@@ -22,12 +24,12 @@ class PurchaseClass {
           "quantity_purchased",
           "date_purchased"
         )
-        .join("product", "purchase_records.product_id", "product.id");
+        .join("product", "purchase_records.product_id", "product.id")
+        .offset((page - 1) * 10)
+        .limit(10);
       return data.length ? data : 0;
     } catch (error) {
       return false;
-    } finally {
-      db.destroy();
     }
   }
 
@@ -56,8 +58,6 @@ class PurchaseClass {
       return data.length ? data : 0;
     } catch (error) {
       return false;
-    } finally {
-      db.destroy();
     }
   }
 

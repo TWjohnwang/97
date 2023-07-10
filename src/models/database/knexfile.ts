@@ -21,7 +21,7 @@ const config: KnexConfig = {
       min: 2,
       max: 10,
     },
-    debug: true,
+    // debug: true,
     migrations: {
       extension: "ts",
     },

@@ -8,12 +8,14 @@ class SalesClass {
     this.requestBody = requestBody;
   }
 
-  public static async fetchAllSales() {
+  public static async fetchAllSales(page: number) {
     try {
       const data = await db("sales_detail")
         .select("sales_records.id", "name", "selling_price", "quantity_sold")
         .join("product", "sales_detail.product_id", "product.id")
-        .join("sales_records", "sales_detail.sales_id", "sales_records.id");
+        .join("sales_records", "sales_detail.sales_id", "sales_records.id")
+        .offset((page - 1) * 10)
+        .limit(10);
       if (Array.isArray(data) && data.length !== 0) {
         // Group by id
         const groups = _.groupBy(data, "id");

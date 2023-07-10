@@ -10,7 +10,14 @@ interface UpdateProduct extends Partial<ProductData> {
 type DeleteProduct = Pick<ProductData, "name">;
 
 export async function fetchAll(req: Request, res: Response) {
-  const result = await ProductClass.fetchAllProduct();
+  const page = req.query.page ? parseInt(<string>req.query.page) : 1;
+  if (isNaN(page) || page === 0) {
+    return res.status(Status.BadRequest).json({
+      status: "failed",
+      message: "Invalid page number",
+    });
+  }
+  const result = await ProductClass.fetchAllProduct(page);
   switch (result) {
     case false:
       res.status(Status.InternalServerError).json({
@@ -25,11 +32,10 @@ export async function fetchAll(req: Request, res: Response) {
       });
       break;
     default:
-      res.status(Status.Success).json({
+      return res.status(Status.Success).json({
         status: "success",
         result,
       });
-      break;
   }
 }
 
@@ -78,12 +84,10 @@ export async function fetchByCondition(req: Request, res: Response) {
 export async function addProduct(req: Request, res: Response) {
   const requestBody: ProductData = req.body;
   if (
-    Object.keys(requestBody).length < 4 ||
-    (!requestBody.name &&
-      !requestBody.selling_price &&
-      !requestBody.quantity_sold &&
-      !requestBody.inventory &&
-      !requestBody.note)
+    !requestBody.name ||
+    requestBody.selling_price === undefined ||
+    requestBody.quantity_sold === undefined ||
+    requestBody.inventory === undefined
   ) {
     return res.status(Status.BadRequest).json({
       status: "failed",
@@ -133,7 +137,7 @@ export async function updateProduct(req: Request, res: Response) {
     Object.keys(requestBody).length < 2 ||
     (!requestBody.newName &&
       !requestBody.selling_price &&
-      !requestBody.selling_price &&
+      !requestBody.quantity_sold &&
       !requestBody.inventory &&
       !requestBody.note)
   ) {
@@ -161,7 +165,13 @@ export async function updateProduct(req: Request, res: Response) {
     case Status.NotFound:
       res.status(Status.NotFound).json({
         status: "failed",
-        message: "No data found",
+        message: "No data updated",
+      });
+      break;
+    case Status.BadRequest:
+      res.status(Status.BadRequest).json({
+        status: "failed",
+        message: "Cannot update duplicated product name",
       });
       break;
     default:
@@ -192,13 +202,13 @@ export async function deleteProduct(req: Request, res: Response) {
     case Status.NotFound:
       res.status(Status.NotFound).json({
         status: "failed",
-        message: "No data found",
+        message: "No data deleted",
       });
       break;
     case Status.BadRequest:
       res.status(Status.BadRequest).json({
         status: "failed",
-        message: "Cannot delete product with existing sales record",
+        message: "Cannot delete product for existing references.",
       });
       break;
     default:

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ProductData, SalesData, Purchase_records } from "./interface";
+import { Status } from "./interface";
 
 export const dataTypeCheck = (
   req: Request,
@@ -20,7 +21,7 @@ export const dataTypeCheck = (
     ("quantity_purchased" in requestBody &&
       !Number.isInteger(requestBody.quantity_purchased))
   ) {
-    return res.status(400).json({
+    return res.status(Status.BadRequest).json({
       status: "failed",
       message: "Invalid data type",
     });

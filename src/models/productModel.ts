@@ -16,11 +16,15 @@ class ProductClass {
     this.inventory = inventory;
     this.note = note;
   }
-  public static async fetchAllProduct(): Promise<ProductData[] | false | 0> {
+  public static async fetchAllProduct(
+    page: number
+  ): Promise<ProductData[] | false | 0> {
     try {
       const data: ProductData[] = await db("product")
         .select("name", "selling_price", "quantity_sold", "inventory", "note")
-        .from("product");
+        .from("product")
+        .offset((page - 1) * 10)
+        .limit(10);
       return data.length ? data : 0;
     } catch (error) {
       return false;
@@ -115,7 +119,11 @@ class ProductClass {
       }
       return 200;
     } catch (e) {
-      return e;
+      const error = e as ErrorMessage;
+      if (error.code === "ER_DUP_ENTRY") {
+        return 400;
+      }
+      return 500;
     }
   }
 
