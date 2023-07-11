@@ -2,6 +2,7 @@ import BigNumber from "bignumber.js";
 import ProductClass from "../models/productModel";
 import { Request, Response } from "express";
 import { ProductData, Status } from "../utils/interface";
+import { getRedisData, setRedisData } from "../models/redis";
 
 interface UpdateProduct extends Partial<ProductData> {
   newName?: string;
@@ -17,6 +18,15 @@ export async function fetchAll(req: Request, res: Response) {
       message: "Invalid page number",
     });
   }
+  const redisResult = await getRedisData("product", page);
+  if (redisResult) {
+    const data = JSON.parse(redisResult as unknown as string);
+    return res.status(Status.Success).json({
+      status: "success",
+      result: data,
+    });
+  }
+
   const result = await ProductClass.fetchAllProduct(page);
   switch (result) {
     case false:
@@ -32,6 +42,7 @@ export async function fetchAll(req: Request, res: Response) {
       });
       break;
     default:
+      await setRedisData("product", page, result);
       return res.status(Status.Success).json({
         status: "success",
         result,

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import SalesClass from "../models/salesModel";
 import { Status, SalesData } from "../utils/interface";
+import { getRedisData, setRedisData } from "../models/redis";
 
 export async function fetchAll(req: Request, res: Response) {
   const page = req.query.page ? parseInt(req.query.page as string) : 1;
@@ -10,6 +11,15 @@ export async function fetchAll(req: Request, res: Response) {
       message: "Invalid page number",
     });
   }
+  const redisResult = await getRedisData("sales", page);
+  if (redisResult) {
+    const data = JSON.parse(redisResult as unknown as string);
+    return res.status(Status.Success).json({
+      status: "success",
+      result: data,
+    });
+  }
+
   const result = await SalesClass.fetchAllSales(page);
   switch (result) {
     case false:
@@ -25,6 +35,7 @@ export async function fetchAll(req: Request, res: Response) {
       });
       break;
     default:
+      await setRedisData("sales", page, result);
       res.status(Status.Success).json({
         status: "success",
         result,

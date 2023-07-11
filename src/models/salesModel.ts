@@ -1,6 +1,10 @@
 import db from "./database/config";
 import _ from "lodash";
-import { SalesData, ProductSalesData } from "../utils/interface";
+import {
+  SalesData,
+  ProductSalesData,
+  SalesReturnData,
+} from "../utils/interface";
 import { v4 as uuidv4 } from "uuid";
 
 class SalesClass {
@@ -29,7 +33,7 @@ class SalesClass {
           })
         );
 
-        return result;
+        return result as unknown as SalesReturnData[];
       }
       return 0;
     } catch (error) {

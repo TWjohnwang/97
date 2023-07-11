@@ -48,6 +48,11 @@ export type ProductSalesData = Pick<
   "id" | "name" | "selling_price" | "inventory"
 >;
 
+export type SalesReturnData = Pick<
+  Product,
+  "name" | "selling_price" | "quantity_sold"
+> & { revenue: number };
+
 export interface ErrorMessage {
   code: string;
   errno: number;

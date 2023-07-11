@@ -2,6 +2,7 @@ import BigNumber from "bignumber.js";
 import PurchaseClass from "../models/purchaseModel";
 import { Request, Response } from "express";
 import { Status, PurchaseData } from "../utils/interface";
+import { getRedisData, setRedisData } from "../models/redis";
 
 export async function fetchAll(req: Request, res: Response) {
   const page = req.query.page ? parseInt(req.query.page as string) : 1;
@@ -11,6 +12,15 @@ export async function fetchAll(req: Request, res: Response) {
       message: "Invalid page number",
     });
   }
+  const redisResult = await getRedisData("purchase", page);
+  if (redisResult) {
+    const data = JSON.parse(redisResult as unknown as string);
+    return res.status(Status.Success).json({
+      status: "success",
+      result: data,
+    });
+  }
+
   const result = await PurchaseClass.fetchAllPurchase(page);
   switch (result) {
     case false:
@@ -26,6 +36,7 @@ export async function fetchAll(req: Request, res: Response) {
       });
       break;
     default:
+      await setRedisData("purchase", page, result);
       res.status(Status.Success).json({
         status: "success",
         result,

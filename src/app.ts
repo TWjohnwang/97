@@ -11,8 +11,5 @@ app.use("/sales", salesRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  if (PORT === 3000) {
-    console.log("true");
-  }
   console.log(`server is listening on ${PORT} !!!`);
 });
