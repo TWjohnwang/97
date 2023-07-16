@@ -53,6 +53,13 @@ export type SalesReturnData = Pick<
   "name" | "selling_price" | "quantity_sold"
 > & { revenue: number };
 
+export interface SalesRequestBody {
+  id: string;
+  name: string;
+  quantity_sold: number;
+  revenue: number;
+}
+
 export interface ErrorMessage {
   code: string;
   errno: number;

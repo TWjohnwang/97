@@ -19,8 +19,10 @@ export const dataTypeCheck = (
     ("purchase_price" in requestBody &&
       typeof requestBody.purchase_price !== "number") ||
     ("quantity_purchased" in requestBody &&
-      !Number.isInteger(requestBody.quantity_purchased))
+      !Number.isInteger(requestBody.quantity_purchased)) ||
+    ("revenue" in requestBody && typeof requestBody.revenue !== "number")
   ) {
+    console.log(requestBody)
     return res.status(Status.BadRequest).json({
       status: "failed",
       message: "Invalid data type",

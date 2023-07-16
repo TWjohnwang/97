@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import SalesClass from "../models/salesModel";
-import { Status, SalesData } from "../utils/interface";
-import { getRedisData, setRedisData } from "../models/redis";
+import { Status, SalesData, SalesRequestBody } from "../utils/interface";
+import { getRedisData, setRedisData, deleteAllRedisData } from "../models/redis";
 
 export async function fetchAll(req: Request, res: Response) {
   const page = req.query.page ? parseInt(req.query.page as string) : 1;
@@ -43,6 +43,38 @@ export async function fetchAll(req: Request, res: Response) {
   }
 }
 
+export async function fetchByCondition(req: Request, res: Response) {
+  const requestBody: SalesRequestBody = req.body;
+  if (Object.keys(requestBody).length === 0) {
+    return res.status(Status.BadRequest).json({
+      status: "failed",
+      message: "Missing properties in the request body",
+    });
+  }
+  const sales = new SalesClass(requestBody);
+  const result = await sales.fetchSalesByCondition();
+  switch (result) {
+    case false:
+      res.status(Status.InternalServerError).json({
+        status: "failed",
+        message: "Internal server error",
+      });
+      break;
+    case 0:
+      res.status(Status.NotFound).json({
+        status: "failed",
+        message: "No data found",
+      });
+      break;
+    default:
+      res.status(Status.Success).json({
+        status: "success",
+        result,
+      });
+      break;
+  }
+}
+
 export async function addSales(req: Request, res: Response) {
   const requestBody: SalesData[] = req.body;
   const sales = new SalesClass(requestBody);
@@ -67,9 +99,10 @@ export async function addSales(req: Request, res: Response) {
       });
       break;
     default:
+      await deleteAllRedisData();
       res.status(Status.Success).json({
         status: "success",
-        message: "New sales added",
+        result: "New sales added",
       });
   }
 }

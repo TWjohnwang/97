@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import ProductClass from "../models/productModel";
 import { Request, Response } from "express";
 import { ProductData, Status } from "../utils/interface";
-import { getRedisData, setRedisData } from "../models/redis";
+import { getRedisData, setRedisData, deleteAllRedisData } from "../models/redis";
 
 interface UpdateProduct extends Partial<ProductData> {
   newName?: string;
@@ -26,7 +26,6 @@ export async function fetchAll(req: Request, res: Response) {
       result: data,
     });
   }
-
   const result = await ProductClass.fetchAllProduct(page);
   switch (result) {
     case false:
@@ -127,9 +126,10 @@ export async function addProduct(req: Request, res: Response) {
       });
       break;
     default:
+      await deleteAllRedisData();
       res.status(Status.Success).json({
         status: "success",
-        message: "Data added successfully",
+        result: "Data added successfully",
       });
       break;
   }
@@ -186,9 +186,10 @@ export async function updateProduct(req: Request, res: Response) {
       });
       break;
     default:
+      await deleteAllRedisData();
       res.status(Status.Success).json({
         status: "success",
-        message: "Data updated successfully",
+        result: "Data updated successfully",
       });
   }
 }
@@ -223,9 +224,10 @@ export async function deleteProduct(req: Request, res: Response) {
       });
       break;
     default:
+      await deleteAllRedisData();
       res.status(Status.Success).json({
         status: "success",
-        message: "Data deleted successfully",
+        result: "Data deleted successfully",
       });
   }
 }
